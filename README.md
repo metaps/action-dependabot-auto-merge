@@ -28,5 +28,5 @@ jobs:
 
 | input          | required | default                  | description                                         |
 |----------------|----------|--------------------------|-----------------------------------------------------|
-| `github-token` | ✔        | `github.token`           | mergeに利用するgithub tokenを指定します                 |
+| `github-token` | ✔        |                          | mergeに利用するgithub tokenを指定します                 |
 | `merge-method` | ❌       | `merge`                  | マージ方法を指定します. (squash,rebase,merge)           |
