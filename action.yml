@@ -1,0 +1,46 @@
+name: 'Dependabot PR auto merge'
+description: 'Dependabot PR auto merge'
+inputs:
+  merge-method:
+    description: 'merge method. squash|rebase|merge'
+    required: false
+    default: 'merge'
+  github-token:
+    description: 'github token'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Check author
+      if: ${{ github.actor != 'dependabot[bot]' }}
+      shell: bash
+      run: |
+        echo 'Skip dependabot auto merge'
+        exit 1
+    - name: Approve a PR
+      shell: bash
+      run: gh pr review --approve "$PR_URL"
+      env:
+        PR_URL: ${{ github.event.pull_request.html_url }}
+        GH_TOKEN: ${{ inputs.github-token }}
+    - name: Enable squash auto-merge
+      if: ${{ inputs.merge-method == 'squash' }}
+      shell: bash
+      run: gh pr merge --auto --squash "$PR_URL"
+      env:
+        PR_URL: ${{ github.event.pull_request.html_url }}
+        GH_TOKEN: ${{ inputs.github-token }}
+    - name: Enable rebase auto-merge
+      if: ${{ inputs.merge-method == 'rebase' }}
+      shell: bash
+      run: gh pr merge --auto --rebase "$PR_URL"
+      env:
+        PR_URL: ${{ github.event.pull_request.html_url }}
+        GH_TOKEN: ${{ inputs.github-token }}
+    - name: Enable merge auto-merge
+      if: ${{ inputs.merge-method == 'merge' }}
+      shell: bash
+      run: gh pr merge --auto --merge "$PR_URL"
+      env:
+        PR_URL: ${{ github.event.pull_request.html_url }}
+        GH_TOKEN: ${{ inputs.github-token }}
