@@ -4,7 +4,7 @@ Merge dependabot PR by auto merge
 # 利用の方法
 1. こちらの[リンク](https://docs.github.com/ja/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository#%E3%83%AA%E3%83%9D%E3%82%B8%E3%83%88%E3%83%AA%E3%81%AE-github-actions-%E6%A8%A9%E9%99%90%E3%82%92%E7%AE%A1%E7%90%86%E3%81%99%E3%82%8B)先の内容にしたがって、actionの設定画面より下記のオプションを有効にしてください。
   ```
-  [Allow metaps actions and reusable workflows]`
+  [Allow OWNER, and select non-OWNER, actions and reusable workflows]`
   ```
 2. こちらの[リンク](https://docs.github.com/ja/code-security/dependabot/dependabot-version-updates/configuring-dependabot-version-updates#dependabot-version-updates-%E3%82%92%E6%9C%89%E5%8A%B9%E5%8C%96%E3%81%99%E3%82%8B)先の内容にしたがって、dependabotを有効化してください。
 3. `.github/dependabot.yml`を配置し、dependabotを有効化して下さい。<br>
