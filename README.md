@@ -34,8 +34,7 @@ jobs:
     if: ${{ github.actor == 'dependabot[bot]' }}
     runs-on: ubuntu-latest
     steps:
-      - name: Dependabot metadata
-        id: dependabot-metadata
+      - name: auto merge
         uses: metaps/action-dependabot-auto-merge@main
         with:
           merge-method: "squash"
