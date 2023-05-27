@@ -1,13 +1,21 @@
 name: 'Dependabot PR auto merge'
 description: 'Dependabot PR auto merge'
+
 inputs:
   merge-method:
     description: 'merge method. squash|rebase|merge'
     required: false
     default: 'merge'
+
   github-token:
     description: 'github token'
     required: true
+
+  allow-merge-version-type:
+    required: false
+    description: 'version type. major|minor|patch'
+    default: 'minor'
+
 runs:
   using: "composite"
   steps:
@@ -17,30 +25,53 @@ runs:
       run: |
         echo 'Skip dependabot auto merge'
         exit 1
+
+    - name: Check merge method
+      if: ${{ !contains(['squash', 'rebase', 'merge'], inputs.merge-method) }}
+      shell: bash
+      run: |
+        echo 'Invalid merge method'
+        exit 1
+
+    - name: Version type
+      id: version
+      shell: bash
+      run: |
+        if [ "${{ inputs.allow-merge-version-type }}" = "major" ]; then
+          UPDATE_VERSION_TYPES='["version-update:semver-major","version-update:semver-minor","version-update:semver-patch"]'
+
+        elif [ "${{ inputs.allow-merge-version-type }}" = "minor" ]; then
+          UPDATE_VERSION_TYPES='["version-update:semver-minor","version-update:semver-patch"]'
+        
+        elif [ "${{ inputs.allow-merge-version-type }}" = "patch" ]; then
+          UPDATE_VERSION_TYPES='["version-update:semver-patch"]'
+        
+        else
+          echo "Invalid version type"
+          exit 1
+        
+        fi
+        
+        echo "update-version-types=$UPDATE_VERSION_TYPES" >> $GITHUB_OUTPUT
+
+    - name: Dependabot metadata
+      id: metadata
+      uses: dependabot/fetch-metadata@v1.3.5
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
     - name: Approve a PR
       shell: bash
+      if: ${{ contains(fromJSON(steps.version.update-version-types), steps.metadata.outputs.update-type) }}
       run: gh pr review --approve "$PR_URL"
       env:
         PR_URL: ${{ github.event.pull_request.html_url }}
         GH_TOKEN: ${{ inputs.github-token }}
+
     - name: Enable squash auto-merge
       if: ${{ inputs.merge-method == 'squash' }}
       shell: bash
-      run: gh pr merge --auto --squash "$PR_URL"
-      env:
-        PR_URL: ${{ github.event.pull_request.html_url }}
-        GH_TOKEN: ${{ inputs.github-token }}
-    - name: Enable rebase auto-merge
-      if: ${{ inputs.merge-method == 'rebase' }}
-      shell: bash
-      run: gh pr merge --auto --rebase "$PR_URL"
-      env:
-        PR_URL: ${{ github.event.pull_request.html_url }}
-        GH_TOKEN: ${{ inputs.github-token }}
-    - name: Enable merge auto-merge
-      if: ${{ inputs.merge-method == 'merge' }}
-      shell: bash
-      run: gh pr merge --auto --merge "$PR_URL"
+      run: gh pr merge --auto --${{ inputs.merge-method }} "$PR_URL"
       env:
         PR_URL: ${{ github.event.pull_request.html_url }}
         GH_TOKEN: ${{ inputs.github-token }}
