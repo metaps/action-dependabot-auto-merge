@@ -27,7 +27,7 @@ runs:
         exit 1
 
     - name: Check merge method
-      if: ${{ !contains(['squash', 'rebase', 'merge'], inputs.merge-method) }}
+      if: ${{ !contains(fromJson('["squash", "rebase", "merge"]'), inputs.merge-method) }}
       shell: bash
       run: |
         echo 'Invalid merge method'
@@ -51,25 +51,23 @@ runs:
           exit 1
         
         fi
-        
+        echo "update-version-types=$UPDATE_VERSION_TYPES"
         echo "update-version-types=$UPDATE_VERSION_TYPES" >> $GITHUB_OUTPUT
 
     - name: Dependabot metadata
       id: metadata
-      uses: dependabot/fetch-metadata@v1.3.5
-      with:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: dependabot/fetch-metadata@v1
 
     - name: Approve a PR
       shell: bash
-      if: ${{ contains(fromJSON(steps.version.update-version-types), steps.metadata.outputs.update-type) }}
+      if: ${{ contains(fromJSON(steps.version.outputs.update-version-types), steps.metadata.outputs.update-type) }}
       run: gh pr review --approve "$PR_URL"
       env:
         PR_URL: ${{ github.event.pull_request.html_url }}
         GH_TOKEN: ${{ inputs.github-token }}
 
-    - name: Enable squash auto-merge
-      if: ${{ inputs.merge-method == 'squash' }}
+    - name: Enable auto-merge
+      if: ${{ contains(fromJSON(steps.version.outputs.update-version-types), steps.metadata.outputs.update-type) }}
       shell: bash
       run: gh pr merge --auto --${{ inputs.merge-method }} "$PR_URL"
       env:

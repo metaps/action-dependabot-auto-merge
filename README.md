@@ -38,6 +38,7 @@ jobs:
         with:
           merge-method: "squash"
           github-token: "${{ secrets.GITHUB_TOKEN }}"
+          allow-merge-version-type: "minor"
 ```
 
 
