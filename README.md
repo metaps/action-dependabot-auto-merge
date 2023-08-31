@@ -38,12 +38,14 @@ jobs:
         with:
           merge-method: "squash"
           github-token: "${{ secrets.GITHUB_TOKEN }}"
+          allow-merge-version-type: "minor"
 ```
 
 
 ### Inputs
 
-| input          | required | default                  | description                                         |
-|----------------|----------|--------------------------|-----------------------------------------------------|
-| `github-token` | ✔        |                          | mergeに利用するgithub tokenを指定します                 |
-| `merge-method` | ❌       | `merge`                  | マージ方法を指定します. (squash,rebase,merge)           |
+| input          | required | default | description                                         |
+|----------------|----------|---------|-----------------------------------------------------|
+| `github-token` | ✔        |         | mergeに利用するgithub tokenを指定します                 |
+| `merge-method` | ❌       | `merge` | マージ方法を指定します. (squash,rebase,merge)           |
+| `allow-merge-version-type` | ❌       | `minor` | マージを許可するバージョンタイプを指定します. (patch,minor,major)           |
